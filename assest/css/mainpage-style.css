@@ -28,6 +28,8 @@ nav {
 i {
     font-size: 20px;
 }
+.anchor{
+text-decoration: none;}
 
 /* Section 1 (The Beasts Gym) */
 .section1 {
@@ -450,4 +452,5 @@ table tr:hover {
 .health-form .form-group select:focus {
     border-color: #4CAF50; /* Green border on focus */
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    
 }

@@ -1,3 +1,14 @@
+<?php
+session_start();
+if(!isset($_SESSION['user'])){
+  header('location:login.php');
+  exit();
+}
+include('handler/db.php');
+$name = $_SESSION['user']['email'];
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,11 +25,15 @@
             <i class="fa-solid fa-dumbbell"></i>
             <span>The Beasts</span>
         </div>
-        <div class="user-info">Welcome, User Name</div>
+        <div class="user-info"> WELCOME <?php echo $name; ?>
+        </div>
+        <a href="logout.php" title="Logout" class="anchor">
+        <i class="fa fa-sign-out" aria-hidden="true"></i>
+        </a>
     </nav>
 </header>
 <main>
-    <section class="section1">
+    <section class="section1">        
         <p>The Beasts Gym</p>
         <div>Lorem ipsum dolor sit amet distinctio<br>
             consectetur adipisicing elit. Adipisci, totam eum! <br>
