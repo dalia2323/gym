@@ -1,13 +1,26 @@
 <?php
 session_start();
-if(!isset($_SESSION['user'])){
-  header('location:login.php');
-  exit();
+if (!isset($_SESSION['user'])) {
+    header('location:login.php');
+    exit();
 }
 include('handler/db.php');
+if (!$conn) {
+    die("Database connection failed: " . mysqli_connect_error());
+}
 $name = $_SESSION['user']['email'];
+if (isset($_POST['submit-btn-info'])) {
+    $height = filter_var($_POST['height'], FILTER_SANITIZE_STRING);
+    $weight = filter_var($_POST['weight'], FILTER_SANITIZE_STRING);
+    $weightGoal = filter_var($_POST['WeightGoal'], FILTER_SANITIZE_STRING);
+    $query = "UPDATE users 
+            SET weight = '$weight', height = '$height', goalWeight = '$weightGoal'
+            WHERE email = '$name'";
+
+}
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -114,33 +127,22 @@ $name = $_SESSION['user']['email'];
 </section>
 <section class="health-profile">
     <h2>Your Health Profile</h2>
-    <form action="" class="health-form">
-        <div class="form-group">
-            <label for="weight">Weight (kg):</label>
-            <input type="number" id="weight" name="weight" placeholder="Enter your weight" required>
-        </div>
-        <div class="form-group">
-            <label for="height">Height (cm):</label>
-            <input type="number" id="height" name="height" placeholder="Enter your height" required>
-        </div>
-        <div class="form-group">
-            <label for="goal">Fitness Goal:</label>
-            <select id="goal" name="goal" required>
-                <option value="lose-weight">Lose Weight</option>
-                <option value="build-muscle">Build Muscle</option>
-                <option value="maintain">Maintain</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="activity-level">Activity Level:</label>
-            <select id="activity-level" name="activity-level" required>
-                <option value="low">Low</option>
-                <option value="moderate">Moderate</option>
-                <option value="high">High</option>
-            </select>
-        </div>
-        <button type="submit" class="submit-btn">Save Profile</button>
-    </form>
+    <form action="" method="post" class="health-form">
+    <div class="form-group">
+        <label for="weight">Weight (kg):</label>
+        <input type="number" id="weight" name="weight" placeholder="Enter your weight" required>
+    </div>
+    <div class="form-group">
+        <label for="height">Height (cm):</label>
+        <input type="number" id="height" name="height" placeholder="Enter your height" required>
+    </div>
+    <div class="form-group">
+        <label for="WeightGoal">Weight Goal (kg):</label>
+        <input type="number" id="WeightGoal" name="WeightGoal" placeholder="Enter your goal weight" required>
+    </div>
+    <button type="submit" name="submit-btn-info" class="submit-btn-info">Save Profile</button>
+</form>
+
 </section>
 <section class="contact-section">
     <h2>Contact Us</h2>
