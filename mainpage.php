@@ -13,13 +13,27 @@ if (isset($_POST['submit-btn-info'])) {
     $height = filter_var($_POST['height'], FILTER_SANITIZE_STRING);
     $weight = filter_var($_POST['weight'], FILTER_SANITIZE_STRING);
     $weightGoal = filter_var($_POST['WeightGoal'], FILTER_SANITIZE_STRING);
+    // echo "Height: $height, Weight: $weight, Weight Goal: $weightGoal <br>";
     $query = "UPDATE users 
             SET weight = '$weight', height = '$height', goalWeight = '$weightGoal'
             WHERE email = '$name'";
-
+    if (mysqli_query($conn, $query)) {
+    } else {
+        echo "Error: " . mysqli_error($conn);
+    }
 }
-
+$query = "SELECT height, weight, goalWeight FROM users WHERE email = '$name'";
+$result = mysqli_query($conn, $query);
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $height = $row['height'];
+    $weight = $row['weight'];
+    $weightGoal = $row['goalWeight'];
+} else {
+    $height = $weight = $weightGoal = "Not set";
+}
 ?>
+
 
 
 <!DOCTYPE html>
@@ -46,13 +60,15 @@ if (isset($_POST['submit-btn-info'])) {
     </nav>
 </header>
 <main>
-    <section class="section1">        
+    <section class="section1">    
         <p>The Beasts Gym</p>
         <div>Lorem ipsum dolor sit amet distinctio<br>
             consectetur adipisicing elit. Adipisci, totam eum! <br>
             Necessitatibus quidem fugit deleniti ut libero, <br>
             sequi fuga neque aliquid nesciunt veniam fugiat.</div>
-        <button class="main-btn">Get started</button>
+        <button class="main-btn">Get started</button>  
+        <div>
+        </div>
     </section>
     <section class="section2">
         <h2>Reserve a Class</h2>
@@ -61,11 +77,11 @@ if (isset($_POST['submit-btn-info'])) {
                 <img src="assest/img/yoga.jpeg" alt="Yoga Class" class="card-image">
                 <h4>YOGA</h4>
                 <form action="">
-                    <select id="class-select">
+                    <!-- <select id="class-select">
                         <option value="9:00 AM">Class-9:00 AM</option>
                         <option value="10:30 AM">Class-10:30 AM</option>
                         <option value="6:00 PM">Class-6:00 PM</option>
-                    </select>
+                    </select> -->
                     <button class="reserve-btn">Reserve</button>
                 </form>
             </div>
@@ -73,11 +89,11 @@ if (isset($_POST['submit-btn-info'])) {
                 <img src="assest/img/zumba.jpeg" alt="Zumba Class" class="card-image">
                 <h4>ZUMBA</h4>
                 <form action="">
-                    <select id="class-select">
+                    <!-- <select id="class-select">
                         <option value="9:00 AM">Class-9:00 AM</option>
                         <option value="10:30 AM">Class-10:30 AM</option>
                         <option value="6:00 PM">Class-6:00 PM</option>
-                    </select>
+                    </select> -->
                     <button class="reserve-btn">Reserve</button>
                 </form>
             </div>
@@ -85,11 +101,11 @@ if (isset($_POST['submit-btn-info'])) {
                 <img src="assest/img/pilates.jpeg" alt="Pilates Class" class="card-image">
                 <h4>PILATES</h4>
                 <form action="">
-                    <select id="class-select">
+                    <!-- <select id="class-select">
                         <option value="9:00 AM">Class-9:00 AM</option>
                         <option value="10:30 AM">Class-10:30 AM</option>
                         <option value="6:00 PM">Class-6:00 PM</option>
-                    </select>
+                    </select> -->
                     <button class="reserve-btn">Reserve</button>
                 </form>
             </div>
@@ -102,32 +118,24 @@ if (isset($_POST['submit-btn-info'])) {
         <thead>
             <tr>
                 <th>Class Name</th>
-                <th>Time</th>
-                <th>Reservation Status</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>Yoga</td>
-                <td>9:00 AM</td>
-                <td>Reserved</td>
             </tr>
             <tr>
                 <td>Zumba</td>
-                <td>10:30 AM</td>
-                <td>Reserved</td>
             </tr>
             <tr>
                 <td>Pilates</td>
-                <td>6:00 PM</td>
-                <td>Available</td>
             </tr>
         </tbody>
     </table>
 </section>
 <section class="health-profile">
     <h2>Your Health Profile</h2>
-    <form action="" method="post" class="health-form">
+    <form action="" method="post" class="health-form" id="health-form">
     <div class="form-group">
         <label for="weight">Weight (kg):</label>
         <input type="number" id="weight" name="weight" placeholder="Enter your weight" required>
@@ -142,26 +150,28 @@ if (isset($_POST['submit-btn-info'])) {
     </div>
     <button type="submit" name="submit-btn-info" class="submit-btn-info">Save Profile</button>
 </form>
+</section>
+<section class="reservation-table">
+    <h2>Your Health Tracker</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Height</th>
+                <th>Weight</th>
+                <th>Weight Goal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>  <?php echo htmlspecialchars($height); ?></td>
+                <td><?php echo htmlspecialchars($weight); ?></td>
+                <td><?php echo htmlspecialchars($weightGoal); ?></td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="updateinfo">UPDATE</button>
+</section>
 
-</section>
-<section class="contact-section">
-    <h2>Contact Us</h2>
-    <form action="" class="contact-form">
-        <div class="form-group">
-            <label for="name">Your Name:</label>
-            <input type="text" id="name" name="name" placeholder="Enter your name" required>
-        </div>
-        <div class="form-group">
-            <label for="email">Your Email:</label>
-            <input type="email" id="email" name="email" placeholder="Enter your email" required>
-        </div>
-        <div class="form-group">
-            <label for="message">Your Message:</label>
-            <textarea id="message" name="message" placeholder="Enter your message" required></textarea>
-        </div>
-        <button type="submit" class="submit-btn">Send Message</button>
-    </form>
-</section>
 </main>
 <footer class="footer">
     <div class="footer-content">

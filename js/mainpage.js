@@ -6,14 +6,23 @@ mainBtn.addEventListener('click', function(event) {
         targetElement.scrollIntoView({ behavior: 'smooth' });
     
 });
-document.addEventListener('DOMContentLoaded', function() {
-    let infoBtn = document.querySelector('.submit-btn-info');
+document.addEventListener('DOMContentLoaded', function () {
+    let infoBtn = document.querySelector('.updateinfo');
     if (infoBtn) {
-        infoBtn.addEventListener('click', function(event) {
+        infoBtn.addEventListener('click', function (event) {
             event.preventDefault();
-            infoBtn.textContent = 'Update your inform';
+            let targetElement = document.querySelector('.health-profile');
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                console.error('Target element not found: .health-profile');
+            }
         });
     } else {
-        console.error('Element with class .submit-btn-info not found!');
+        console.error('Button not found: .updateinfo');
     }
 });
+
+
+
+
