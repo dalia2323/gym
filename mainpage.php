@@ -32,6 +32,30 @@ if ($result && mysqli_num_rows($result) > 0) {
 } else {
     $height = $weight = $weightGoal = "Not set";
 }
+
+$sql = "SELECT class_name, class_description FROM class";
+$result = $conn->query($sql);
+//
+$user_id = $_SESSION['user'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['class_id'])) {
+    $class_id = intval($_POST['class_id']);
+
+    // Insert reservation into the `reservation` table
+    $stmt = $conn->prepare("INSERT INTO reservation (class_id, user_id) VALUES (?, ?)");
+    $stmt->bind_param("ii", $class_id, $user_id);
+
+    if ($stmt->execute()) {
+        echo "<p>Reservation successful for class ID $class_id!</p>";
+    } else {
+        echo "<p>Error: " . $stmt->error . "</p>";
+    }
+
+    $stmt->close();
+}
+
+// Fetch class data
+$sql1 = "SELECT class_id, class_name, class_description FROM class";
+$result = $conn->query($sql1);
 ?>
 
 
@@ -71,46 +95,40 @@ if ($result && mysqli_num_rows($result) > 0) {
         </div>
     </section>
     <section class="section2">
-        <h2>Reserve a Class</h2>
-        <div id="reservation-form">
-            <div class="item">
-                <img src="assest/img/yoga.jpeg" alt="Yoga Class" class="card-image">
-                <h4>YOGA</h4>
-                <form action="">
-                    <!-- <select id="class-select">
-                        <option value="9:00 AM">Class-9:00 AM</option>
-                        <option value="10:30 AM">Class-10:30 AM</option>
-                        <option value="6:00 PM">Class-6:00 PM</option>
-                    </select> -->
-                    <button class="reserve-btn">Reserve</button>
-                </form>
-            </div>
-            <div class="item">
-                <img src="assest/img/zumba.jpeg" alt="Zumba Class" class="card-image">
-                <h4>ZUMBA</h4>
-                <form action="">
-                    <!-- <select id="class-select">
-                        <option value="9:00 AM">Class-9:00 AM</option>
-                        <option value="10:30 AM">Class-10:30 AM</option>
-                        <option value="6:00 PM">Class-6:00 PM</option>
-                    </select> -->
-                    <button class="reserve-btn">Reserve</button>
-                </form>
-            </div>
-            <div class="item">
-                <img src="assest/img/pilates.jpeg" alt="Pilates Class" class="card-image">
-                <h4>PILATES</h4>
-                <form action="">
-                    <!-- <select id="class-select">
-                        <option value="9:00 AM">Class-9:00 AM</option>
-                        <option value="10:30 AM">Class-10:30 AM</option>
-                        <option value="6:00 PM">Class-6:00 PM</option>
-                    </select> -->
-                    <button class="reserve-btn">Reserve</button>
-                </form>
-            </div>
-        </div>
-    </section>
+    <h2>Reserve a Class</h2>
+    <div id="reservation-form">
+    
+            <?php
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $class_id = $row['class_id'];
+                    $className = htmlspecialchars($row['class_name']);
+                    $description = htmlspecialchars($row['class_description']);
+                    $imagePath = "assest/img/" . strtolower($className) . ".jpeg";
+
+                    echo "<div class='item'>";
+                    echo "  <form action='' method='post'>";
+                    echo "<img src='$imagePath' alt='{$className} Class' class='card-image'>";
+                    echo "<h4>" . strtoupper($className) . "</h4>";
+                    echo "<p>$description</p>";
+                    echo "<button class='reserve-btn'>Reserve</button>";
+                    echo "</form>";
+                    echo "</div>";
+                    
+                }
+            } else {
+                echo "<p>No classes available at the moment.</p>";
+            }
+            ?>
+        </form>
+    </div>
+</section>
+
+<?php
+$conn->close();
+?>
+
+    
  <!-- New Section for Reservations Table -->
  <section class="reservation-table">
     <h2>Your Reservations</h2>
