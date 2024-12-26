@@ -13,7 +13,6 @@ if (isset($_POST['submit-btn-info'])) {
     $height = filter_var($_POST['height'], FILTER_SANITIZE_STRING);
     $weight = filter_var($_POST['weight'], FILTER_SANITIZE_STRING);
     $weightGoal = filter_var($_POST['WeightGoal'], FILTER_SANITIZE_STRING);
-    // echo "Height: $height, Weight: $weight, Weight Goal: $weightGoal <br>";
     $query = "UPDATE users 
             SET weight = '$weight', height = '$height', goalWeight = '$weightGoal'
             WHERE email = '$name'";
@@ -35,31 +34,23 @@ if ($result && mysqli_num_rows($result) > 0) {
 
 $sql = "SELECT class_name, class_description FROM class";
 $result = $conn->query($sql);
-//
+
 $user_id = $_SESSION['user'];
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['class_id'])) {
     $class_id = intval($_POST['class_id']);
-
-    // Insert reservation into the `reservation` table
     $stmt = $conn->prepare("INSERT INTO reservation (class_id, user_id) VALUES (?, ?)");
     $stmt->bind_param("ii", $class_id, $user_id);
 
-    if ($stmt->execute()) {
-        echo "<p>Reservation successful for class ID $class_id!</p>";
-    } else {
+    if (!$stmt->execute()) {
         echo "<p>Error: " . $stmt->error . "</p>";
     }
 
     $stmt->close();
 }
 
-// Fetch class data
 $sql1 = "SELECT class_id, class_name, class_description FROM class";
 $result = $conn->query($sql1);
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,38 +88,60 @@ $result = $conn->query($sql1);
     <section class="section2">
     <h2>Reserve a Class</h2>
     <div id="reservation-form">
-    
-            <?php
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $class_id = $row['class_id'];
-                    $className = htmlspecialchars($row['class_name']);
-                    $description = htmlspecialchars($row['class_description']);
-                    $imagePath = "assest/img/" . strtolower($className) . ".jpeg";
+        <?php
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $class_id = $row['class_id'];
+                $className = htmlspecialchars($row['class_name']);
+                $description = htmlspecialchars($row['class_description']);
+                $imagePath = "assest/img/" . strtolower($className) . ".jpeg";
 
-                    echo "<div class='item'>";
-                    echo "  <form action='' method='post'>";
-                    echo "<img src='$imagePath' alt='{$className} Class' class='card-image'>";
-                    echo "<h4>" . strtoupper($className) . "</h4>";
-                    echo "<p>$description</p>";
-                    echo "<button class='reserve-btn'>Reserve</button>";
-                    echo "</form>";
-                    echo "</div>";
-                    
-                }
-            } else {
-                echo "<p>No classes available at the moment.</p>";
+                echo "<div class='item'>";
+                echo "  <form action='' method='post'>";
+                echo "<img src='$imagePath' alt='{$className} Class' class='card-image'>";
+                echo "<h4>" . strtoupper($className) . "</h4>";
+                echo "<p>$description</p>";
+                echo "<input type='hidden' name='class_id' value='$class_id'>";
+                echo "<button type='submit' name='reserve' class='reserve-btn'>Reserve</button>";
+                echo "</form>";
+                echo "</div>";
             }
-            ?>
-        </form>
+        } else {
+            echo "<p>No classes available at the moment.</p>";
+        }
+        ?>
     </div>
 </section>
 
 <?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reserve'])) {
+    $class_id = intval($_POST['class_id']);
+    $user_id = $_SESSION['user'];
+
+    $checkSql = "SELECT * FROM reservation WHERE user_id = ? AND class_id = ?";
+    $stmt = $conn->prepare($checkSql);
+    $stmt->bind_param("ii", $user_id, $class_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+    } else {
+        $insertSql = "INSERT INTO reservation (user_id, class_id) VALUES (?, ?)";
+        $stmt = $conn->prepare($insertSql);
+        $stmt->bind_param("ii", $user_id, $class_id);
+
+        if ($stmt->execute()) {
+            echo "<p>Reservation successful!</p>";
+        } else {
+            echo "<p>Failed to reserve the class. Please try again.</p>";
+        }
+    }
+
+    $stmt->close();
+}
+
 $conn->close();
 ?>
-
-    
  <!-- New Section for Reservations Table -->
  <section class="reservation-table">
     <h2>Your Reservations</h2>
