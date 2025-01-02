@@ -10,6 +10,10 @@ if (isset($_POST['login'])) {
     if (empty($email)) {
         $errors[] = "You should enter an email";
     }
+    if(0){
+
+      
+    }
     if (!empty($email)) {
       $stm = "SELECT * FROM users WHERE email=? AND password=?";
     $q = $conn->prepare($stm);
